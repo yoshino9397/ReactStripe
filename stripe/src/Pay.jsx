@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import StripeCheckout from "react-stripe-checkout";
 import axios from "axios";
+import { useNavigate } from "react-router";
 
 const KEY =
   "pk_test_51KfrjdF19OTpJSTE2oCDz7OnY2ZoOknrgnjXuMQ577CxryPXSRQ1MQU7YtRYfWZP4E9Lai9rr7JwATolbgMDk5na004ZJR6za9";
 
 const Pay = () => {
   const [stripeToken, setStripeToken] = useState(null);
+  const navigate = useNavigate();
   const onToken = (token) => {
     setStripeToken(token);
   };
@@ -21,12 +23,13 @@ const Pay = () => {
           }
         );
         console.log(res.data);
+        navigate("/success");
       } catch (err) {
         console.log(err);
       }
     };
     stripeToken && makeRequest();
-  }, [stripeToken]);
+  }, [stripeToken, navigate]);
 
   return (
     <div
@@ -37,32 +40,36 @@ const Pay = () => {
         justifyContent: "center",
       }}
     >
-      <StripeCheckout
-        name="Yoshino Shop"
-        image="https://live.staticflickr.com/65535/51939942692_9e93d5d4e2_b.jpg"
-        billingAddress
-        shippingAddress
-        description="Your total is $100"
-        locale="en"
-        amount={30000}
-        token={onToken}
-        stripeKey={KEY}
-      >
-        <button
-          style={{
-            border: "none",
-            width: 120,
-            height: 50,
-            borderRadius: "5px",
-            backgroundColor: "black",
-            color: "white",
-            fontWeight: "600",
-            cursor: "pointer",
-          }}
+      {stripeToken ? (
+        <span>Processing.Please wait....</span>
+      ) : (
+        <StripeCheckout
+          name="Yoshino Shop"
+          image="https://live.staticflickr.com/65535/51939942692_9e93d5d4e2_b.jpg"
+          billingAddress
+          shippingAddress
+          description="Your total is $300"
+          locale="en"
+          amount={30000}
+          token={onToken}
+          stripeKey={KEY}
         >
-          Pay Now
-        </button>
-      </StripeCheckout>
+          <button
+            style={{
+              border: "none",
+              width: 120,
+              height: 50,
+              borderRadius: "5px",
+              backgroundColor: "black",
+              color: "white",
+              fontWeight: "600",
+              cursor: "pointer",
+            }}
+          >
+            Pay Now
+          </button>
+        </StripeCheckout>
+      )}
     </div>
   );
 };
